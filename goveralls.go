@@ -51,6 +51,7 @@ var (
 	coverprof  = flag.String("coverprofile", "", "If supplied, use a go cover profile (comma separated)")
 	covermode  = flag.String("covermode", "count", "sent as covermode argument to go test")
 	repotoken  = flag.String("repotoken", os.Getenv("COVERALLS_TOKEN"), "Repository Token on coveralls")
+	jobId      = flag.String("jobId", os.Getenv("BUILD_NUMBER"), "Build Number for non supported ci's")
 	parallel   = flag.Bool("parallel", os.Getenv("COVERALLS_PARALLEL") != "", "Submit as parallel")
 	endpoint   = flag.String("endpoint", "https://coveralls.io", "Hostname to submit Coveralls data to")
 	service    = flag.String("service", "travis-ci", "The CI service or other environment in which the test suite was run. ")
@@ -242,7 +243,13 @@ func process() error {
 	//
 	// Initialize Job
 	//
-	var jobId string
+	if *jobId == "" {
+		jobId = nil
+	}
+	else {
+		fmt.Println(jobId)
+	}
+	
 	if travisJobId := os.Getenv("TRAVIS_JOB_ID"); travisJobId != "" {
 		jobId = travisJobId
 	} else if circleCiJobId := os.Getenv("CIRCLE_BUILD_NUM"); circleCiJobId != "" {
